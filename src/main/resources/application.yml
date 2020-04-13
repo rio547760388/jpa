@@ -1,0 +1,16 @@
+server:
+  port: 8090
+  tomcat:
+    basedir: d:/tomcattmp
+spring:
+  profiles:
+    active: dev
+  mvc:
+    date-format: yyyy-MM-dd HH:mm:ss
+#logging:
+#  level:
+#    org.springframework.security: debug
+
+
+
+

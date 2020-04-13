@@ -1,0 +1,81 @@
+spring:
+#datasource
+  datasource:
+    druid:
+      url: jdbc:mysql://localhost:3306/tian?useSSL=false&characterEncoding=UTF-8&useUnicode=true
+      username: tian
+      password: tian1990
+      initial-size: 10
+      max-active: 100
+      min-idle: 10
+      max-wait: 60000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true
+      default-auto-commit: false
+#JPA
+  jpa:
+    #show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+#mongodb
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017
+      database: mysqlcopy
+      auto-index-creation: true
+#threadpool
+  task:
+    scheduling:
+      pool:
+        size: 5
+#jms
+  jms:
+    cache:
+      session-cache-size: 5
+#activemq
+  activemq:
+    broker-url: tcp://TIAN:61616
+    user: admin
+    password: admin
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+  redis:
+    #host: localhost
+    #database: 0
+    #port: 6379
+    timeout: 1800000
+    url: tpc://localhost:6379/0
+#    password: 123
+  session:
+    store-type: redis
+  mail:
+    host: smtp.qq.com
+    port: 465
+    #username:
+    #password:
+    protocol: smtps
+  thymeleaf:
+    cache: false
