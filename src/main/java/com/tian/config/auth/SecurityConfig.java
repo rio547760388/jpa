@@ -17,6 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,6 +30,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -62,8 +65,12 @@ import java.util.stream.Collectors;
  * 说明：
  */
 @Configuration(proxyBeanMethods = false)
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebSecurity
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    HttpMessageConverter mappingJackson2HttpMessageConverter;
 
     @Autowired
     UserService userService;
@@ -237,16 +244,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         res.setCharacterEncoding("UTF-8");
         try {
 
-            ObjectMapper mapper = new ObjectMapper();
+            /*ObjectMapper mapper = new ObjectMapper();
             mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
             mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
             mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
             SimpleModule module = new SimpleModule();
             module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            mapper.registerModule(module);
+            mapper.registerModule(module);*/
 
             if (ex == null) {
-                mapper.writeValue(res.getOutputStream(), Result.succ());
+                //mapper.writeValue(res.getOutputStream(), Result.succ());
+                mappingJackson2HttpMessageConverter.write(Result.succ(), MediaType.APPLICATION_JSON, new ServletServerHttpResponse(res));
                 return;
             }
 
@@ -257,7 +265,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             else
                 res.setStatus(HttpStatus.BAD_REQUEST.value());
 
-            mapper.writeValue(res.getOutputStream(), Result.error(ex.getLocalizedMessage()));
+            mappingJackson2HttpMessageConverter.write(Result.error(ex.getLocalizedMessage()), MediaType.APPLICATION_JSON, new ServletServerHttpResponse(res));
+            //mapper.writeValue(res.getOutputStream(), Result.error(ex.getLocalizedMessage()));
 
         } catch (IOException e) {
             e.printStackTrace();
